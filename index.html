@@ -4,32 +4,383 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>KAPITAL | The Craftsmanship of Denim</title>
+  
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500&family=Noto+Serif+JP:wght@400;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="style.css">
+
+  <style>
+    /* =========================================
+       1. Design System & Variables (디자인 시스템)
+       ========================================= */
+    :root {
+      /* KAPITAL 브랜드 핵심 컬러 */
+      --kapital-indigo: #1B2A49; /* 전통 천연 인디고 블루 */
+      --kapital-mud: #5C4033;    /* 진흙 염색 브라운 */
+      --kapital-bone: #F5F2EB;   /* 빈티지 에크루/본 화이트 */
+      --kapital-accent: #8B0000; /* 스마일리, 레드 스티치 포인트 컬러 */
+
+      /* Original White Mode (기본 라이트 테마) */
+      --bg-surface: var(--kapital-bone);
+      --text-primary: var(--kapital-indigo);
+      --text-secondary: var(--kapital-mud);
+      --border-color: var(--kapital-indigo);
+
+      /* 타이포그래피 */
+      --font-heading: 'Noto Serif JP', serif;
+      --font-body: 'Inter', sans-serif;
+    }
+
+    /* Vintage Indigo Mode (다크 테마 전환 시 적용) */
+    [data-theme="indigo"] {
+      --bg-surface: var(--kapital-indigo);
+      --text-primary: var(--kapital-bone);
+      --text-secondary: #A0B0C0;
+      --border-color: var(--kapital-bone);
+    }
+
+    /* =========================================
+       2. Global Reset & Base
+       ========================================= */
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      background-color: var(--bg-surface);
+      color: var(--text-primary);
+      font-family: var(--font-body);
+      /* 부드러운 테마 전환 애니메이션 */
+      transition: background-color 0.4s ease, color 0.4s ease;
+      line-height: 1.6;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    .font-heading {
+      font-family: var(--font-heading);
+    }
+
+    a {
+      text-decoration: none;
+      color: inherit;
+    }
+
+    /* =========================================
+       3. Header & Navigation (상단 고정 내비게이션)
+       ========================================= */
+    .site-header {
+      position: sticky;
+      top: 0;
+      width: 100%;
+      border-bottom: 1px solid var(--border-color);
+      background-color: var(--bg-surface);
+      z-index: 100;
+      transition: background-color 0.4s ease, border-color 0.4s ease;
+    }
+
+    .header-inner {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 0 40px;
+      height: 80px;
+      max-width: 1440px;
+      margin: 0 auto;
+    }
+
+    .logo {
+      font-family: var(--font-heading);
+      font-size: 28px;
+      letter-spacing: 3px;
+      font-weight: 700;
+      cursor: pointer;
+    }
+
+    .nav-list {
+      display: flex;
+      list-style: none;
+      gap: 50px;
+      height: 100%;
+    }
+
+    .nav-item {
+      display: flex;
+      align-items: center;
+      height: 100%;
+    }
+
+    .nav-item a {
+      font-family: var(--font-heading);
+      font-size: 16px;
+      position: relative;
+      cursor: pointer;
+    }
+
+    /* 테마 토글 버튼 스타일 */
+    .btn-theme {
+      background: transparent;
+      border: 1px solid var(--border-color);
+      color: var(--text-primary);
+      padding: 8px 16px;
+      cursor: pointer;
+      border-radius: 2px;
+      font-family: var(--font-body);
+      font-size: 14px;
+      transition: all 0.3s ease;
+    }
+
+    .btn-theme:hover {
+      background-color: var(--text-primary);
+      color: var(--bg-surface);
+    }
+
+    /* =========================================
+       4. Visual Mega Menu Dropdown (메가 메뉴)
+       ========================================= */
+    .mega-menu {
+      position: absolute;
+      top: 80px;
+      left: 0;
+      width: 100%;
+      background-color: var(--bg-surface);
+      border-bottom: 1px solid var(--border-color);
+      overflow: hidden;
+      max-height: 0;
+      opacity: 0;
+      visibility: hidden;
+      transition: max-height 0.4s cubic-bezier(0.25, 0.8, 0.25, 1), 
+                  opacity 0.3s ease, visibility 0.4s;
+    }
+
+    .mega-menu.active {
+      max-height: 500px;
+      opacity: 1;
+      visibility: visible;
+    }
+
+    .mega-menu-content {
+      display: flex;
+      padding: 40px;
+      gap: 60px;
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+
+    .mega-image-wrapper {
+      flex: 0 0 350px;
+      border: 1px solid var(--border-color);
+      padding: 10px;
+    }
+
+    .mega-image-wrapper img {
+      width: 100%;
+      height: 220px;
+      object-fit: cover;
+      display: block;
+      filter: grayscale(20%);
+    }
+
+    .mega-text-wrapper {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+    }
+
+    .mega-text-wrapper h2 {
+      font-size: 32px;
+      margin-bottom: 10px;
+    }
+
+    .mega-text-wrapper p {
+      color: var(--text-secondary);
+      margin-bottom: 20px;
+      font-size: 15px;
+    }
+
+    .sub-links {
+      list-style: none;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 15px;
+    }
+
+    .sub-links li a {
+      font-size: 15px;
+      border-bottom: 1px solid transparent;
+      padding-bottom: 2px;
+      transition: border-color 0.2s;
+    }
+
+    .sub-links li a:hover {
+      color: var(--kapital-accent);
+      border-bottom: 1px solid var(--kapital-accent);
+    }
+
+    /* =========================================
+       5. Main Content: Lookbook & Hotspot (룩북 영역)
+       ========================================= */
+    main {
+      padding-bottom: 100px;
+    }
+
+    .section-lookbook {
+      padding: 80px 20px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .section-title {
+      margin-bottom: 40px;
+      font-size: 36px;
+      letter-spacing: 1px;
+      text-align: center;
+    }
+
+    .lookbook-frame {
+      position: relative;
+      max-width: 900px;
+      width: 100%;
+      border: 1px solid var(--border-color);
+      padding: 20px;
+      background-color: var(--bg-surface);
+    }
+
+    .lookbook-img {
+      width: 100%;
+      display: block;
+    }
+
+    /* 쇼퍼블 핫스팟 (Shop the Look) 인터랙션 */
+    .hotspot {
+      position: absolute;
+      cursor: pointer;
+      z-index: 10;
+    }
+
+    .hotspot-dot {
+      display: block;
+      width: 18px;
+      height: 18px;
+      background-color: var(--kapital-accent);
+      border-radius: 50%;
+      border: 2px solid var(--kapital-bone);
+      box-shadow: 0 0 0 6px rgba(255, 255, 255, 0.3);
+      transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    }
+
+    .hotspot:hover .hotspot-dot {
+      transform: scale(1.4);
+      box-shadow: 0 0 0 4px rgba(139, 0, 0, 0.2);
+    }
+
+    .hotspot-tooltip {
+      position: absolute;
+      top: 30px;
+      left: 50%;
+      transform: translateX(-50%) translateY(10px);
+      background-color: var(--bg-surface);
+      color: var(--text-primary);
+      border: 1px solid var(--border-color);
+      padding: 12px 16px;
+      white-space: nowrap;
+      opacity: 0;
+      visibility: hidden;
+      transition: all 0.3s ease;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      font-size: 13px;
+      box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+    }
+
+    .hotspot:hover .hotspot-tooltip {
+      opacity: 1;
+      visibility: visible;
+      transform: translateX(-50%) translateY(0);
+    }
+
+    .hotspot-tooltip strong {
+      font-family: var(--font-heading);
+      margin-bottom: 4px;
+      font-size: 14px;
+    }
+
+    .hotspot-tooltip span {
+      color: var(--kapital-accent);
+      font-weight: 500;
+    }
+
+    /* =========================================
+       6. Tags Section (해시태그 탐색 영역)
+       ========================================= */
+    .section-tags {
+      padding: 40px 20px;
+      text-align: center;
+      max-width: 800px;
+      margin: 0 auto;
+      border-top: 1px solid var(--border-color);
+    }
+
+    .section-tags h3 {
+      font-size: 20px;
+      margin-bottom: 24px;
+      color: var(--text-secondary);
+    }
+
+    .tag-container {
+      display: flex;
+      justify-content: center;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+
+    .tag-button {
+      padding: 8px 24px;
+      border: 1px solid var(--border-color);
+      background: transparent;
+      color: var(--text-primary);
+      border-radius: 50px;
+      cursor: pointer;
+      font-size: 14px;
+      transition: all 0.3s ease;
+    }
+
+    .tag-button:hover {
+      background-color: var(--text-primary);
+      color: var(--bg-surface);
+      transform: translateY(-3px);
+      box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    }
+  </style>
 </head>
 <body>
+
   <header class="site-header">
     <div class="header-inner">
-      <h1 class="logo">KAPITAL</h1>
+      <div class="logo">KAPITAL</div>
+      
       <nav class="gnb">
         <ul class="nav-list" id="navList">
-          <li class="nav-item" data-menu="journal"><a href="#journal">JOURNAL</a></li>
-          <li class="nav-item" data-menu="shop"><a href="#shop">SHOP</a></li>
-          <li class="nav-item" data-menu="story"><a href="#story">STORY</a></li>
-          <li class="nav-item" data-menu="locations"><a href="#locations">LOCATIONS</a></li>
+          <li class="nav-item" data-menu="journal"><a>JOURNAL</a></li>
+          <li class="nav-item" data-menu="shop"><a>SHOP</a></li>
+          <li class="nav-item" data-menu="story"><a>STORY</a></li>
+          <li class="nav-item" data-menu="locations"><a>LOCATIONS</a></li>
         </ul>
       </nav>
+
       <div class="header-actions">
-        <button id="themeToggle" class="btn-theme">Toggle Theme</button>
+        <button id="themeToggle" class="btn-theme">Vintage Indigo Mode</button>
       </div>
     </div>
 
     <div class="mega-menu" id="megaMenu">
       <div class="mega-menu-content">
         <div class="mega-image-wrapper">
-          <img src="https://via.placeholder.com/400x250/1B2A49/F5F2EB?text=Visual+Texture" alt="Menu Visual" id="megaMenuImg">
+          <img src="https://images.unsplash.com/photo-1576995853123-5a10305d93c0?q=80&w=600&auto=format&fit=crop" alt="Menu Visual" id="megaMenuImg">
         </div>
         <div class="mega-text-wrapper">
           <h2 class="font-heading" id="megaMenuTitle">CATEGORY</h2>
@@ -44,8 +395,10 @@
   <main>
     <section id="journal" class="section-lookbook">
       <h2 class="section-title font-heading">2026 SS ISLA BONITA</h2>
+      
       <div class="lookbook-frame">
-        <img src="https://via.placeholder.com/800x600/5C4033/F5F2EB?text=Lookbook+Spread" alt="Lookbook Page" class="lookbook-img">
+        <img src="https://images.unsplash.com/photo-1542272454315-4c01d7abdf4a?q=80&w=1200&auto=format&fit=crop" alt="KAPITAL Lookbook Spread" class="lookbook-img">
+        
         <div class="hotspot" style="top: 45%; left: 60%;">
           <span class="hotspot-dot"></span>
           <div class="hotspot-tooltip">
@@ -53,348 +406,130 @@
             <span>Shop the Look &rarr;</span>
           </div>
         </div>
+
+        <div class="hotspot" style="top: 70%; left: 35%;">
+          <span class="hotspot-dot"></span>
+          <div class="hotspot-tooltip">
+            <strong>Boro Patchwork Jacket</strong>
+            <span>Shop the Look &rarr;</span>
+          </div>
+        </div>
       </div>
     </section>
 
     <section id="explore" class="section-tags">
-      <h3 class="font-heading">Explore by Heritage</h3>
+      <h3 class="font-heading">Explore Heritage Archive</h3>
       <div class="tag-container">
         <button class="tag-button">#Boro</button>
         <button class="tag-button">#Smiley</button>
         <button class="tag-button">#Century_Denim</button>
         <button class="tag-button">#Indigo_Dyeing</button>
+        <button class="tag-button">#Kountry</button>
       </div>
     </section>
   </main>
 
-  <script src="app.js"></script>
-</body>
-</html>
-/* --- Design System Variables --- */
-:root {
-  /* Primitives */
-  --kapital-indigo: #1B2A49; 
-  --kapital-mud: #5C4033;  
-  --kapital-bone: #F5F2EB; 
-  --kapital-accent: #8B0000; 
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      
+      /* --- 테마 토글(다크/라이트 모드) 로직 --- */
+      const themeToggleBtn = document.getElementById('themeToggle');
+      const htmlEl = document.documentElement;
 
-  /* Semantics (Original White Mode) */
-  --bg-surface: var(--kapital-bone);
-  --text-primary: var(--kapital-indigo);
-  --text-secondary: var(--kapital-mud);
-  --border-color: var(--kapital-indigo);
+      themeToggleBtn.addEventListener('click', () => {
+        const currentTheme = htmlEl.getAttribute('data-theme');
+        if (currentTheme === 'indigo') {
+          htmlEl.removeAttribute('data-theme');
+          themeToggleBtn.textContent = 'Vintage Indigo Mode';
+        } else {
+          htmlEl.setAttribute('data-theme', 'indigo');
+          themeToggleBtn.textContent = 'Original White Mode';
+        }
+      });
 
-  /* Typography */
-  --font-heading: 'Noto Serif JP', serif;
-  --font-body: 'Inter', sans-serif;
-}
+      /* --- 동적 메가 메뉴 로직 --- */
+      const navItems = document.querySelectorAll('.nav-item');
+      const megaMenu = document.getElementById('megaMenu');
+      const megaMenuTitle = document.getElementById('megaMenuTitle');
+      const megaMenuDesc = document.getElementById('megaMenuDesc');
+      const megaMenuLinks = document.getElementById('megaMenuLinks');
+      const megaMenuImg = document.getElementById('megaMenuImg');
+      
+      // 각 GNB 메뉴에 매핑될 데이터 객체
+      const menuData = {
+        journal: {
+          title: 'JOURNAL',
+          desc: '시즌 룩북 및 에릭 크바텍(Eric Kvatek)과 함께한 비주얼 아카이브.',
+          img: 'https://images.unsplash.com/photo-1552374196-1ab2a1c593e8?q=80&w=600&auto=format&fit=crop',
+          links: ['2026 SS ISLA BONITA', 'Kountry Fall/Winter', 'Denim Bauhaus', 'Editorial Archive']
+        },
+        shop: {
+          title: 'SHOP',
+          desc: '목적형 소비자를 위한 직관적이고 세밀한 의류 탐색 경로.',
+          img: 'https://images.unsplash.com/photo-1542272604-780214c7715f?q=80&w=600&auto=format&fit=crop',
+          links: ['Denim Pants', 'Outerwear & Boro', 'T-Shirts & Sweatshirts', 'Accessories & Bandanas']
+        },
+        story: {
+          title: 'STORY',
+          desc: '일본 코지마의 장인 정신, 전통 염색 기법과 브랜드 헤리티지.',
+          img: 'https://images.unsplash.com/photo-1605020420620-20c943cc4669?q=80&w=600&auto=format&fit=crop',
+          links: ['Century Denim', 'Amami Oshima Mud Dyeing', 'The Art of Boro', 'About Toshikiyo Hirata']
+        },
+        locations: {
+          title: 'LOCATIONS',
+          desc: '전 세계 KAPITAL 매장의 건축적 미학과 오프라인 안내.',
+          img: 'https://images.unsplash.com/photo-1580828369019-222476d0ea40?q=80&w=600&auto=format&fit=crop',
+          links: ['Kojima Flagship', 'Kyoto Store', 'Tokyo Shibuya', 'Global Stockists']
+        }
+      };
 
-/* Vintage Indigo Mode */
-[data-theme="indigo"] {
-  --bg-surface: var(--kapital-indigo);
-  --text-primary: var(--kapital-bone);
-  --text-secondary: #A0B0C0;
-  --border-color: var(--kapital-bone);
-}
+      let hideTimeout;
 
-/* --- Global Reset & Base --- */
-* {
-  box-sizing: border-box;
-  margin: 0;
-  padding: 0;
-}
+      // 네비게이션 아이템에 마우스를 올렸을 때 메가 메뉴 노출
+      navItems.forEach(item => {
+        item.addEventListener('mouseenter', (e) => {
+          clearTimeout(hideTimeout); // 기존 닫힘 예약 취소
+          const category = e.currentTarget.getAttribute('data-menu');
+          const data = menuData[category];
 
-body {
-  background-color: var(--bg-surface);
-  color: var(--text-primary);
-  font-family: var(--font-body);
-  transition: background-color 0.4s ease, color 0.4s ease;
-  line-height: 1.6;
-}
+          if(data) {
+            // 데이터 바인딩 적용
+            megaMenuTitle.textContent = data.title;
+            megaMenuDesc.textContent = data.desc;
+            megaMenuImg.src = data.img;
+            
+            // 서브 링크 생성
+            megaMenuLinks.innerHTML = '';
+            data.links.forEach(linkText => {
+              const li = document.createElement('li');
+              li.innerHTML = `<a href="#">${linkText}</a>`;
+              megaMenuLinks.appendChild(li);
+            });
 
-.font-heading {
-  font-family: var(--font-heading);
-}
-
-a {
-  text-decoration: none;
-  color: inherit;
-}
-
-/* --- Header & Navigation --- */
-.site-header {
-  position: sticky;
-  top: 0;
-  width: 100%;
-  border-bottom: 1px solid var(--border-color);
-  background-color: var(--bg-surface);
-  z-index: 100;
-  transition: background-color 0.4s ease;
-}
-
-.header-inner {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 0 40px;
-  height: 80px;
-}
-
-.logo {
-  font-family: var(--font-heading);
-  font-size: 24px;
-  letter-spacing: 2px;
-}
-
-.nav-list {
-  display: flex;
-  list-style: none;
-  gap: 40px;
-}
-
-.nav-item a {
-  font-family: var(--font-heading);
-  font-size: 16px;
-  position: relative;
-  padding: 10px 0;
-}
-
-.btn-theme {
-  background: none;
-  border: 1px solid var(--border-color);
-  color: var(--text-primary);
-  padding: 8px 16px;
-  cursor: pointer;
-  border-radius: 4px;
-  font-family: var(--font-body);
-}
-
-/* --- Visual Mega Menu --- */
-.mega-menu {
-  position: absolute;
-  top: 80px;
-  left: 0;
-  width: 100%;
-  background-color: var(--bg-surface);
-  border-bottom: 1px solid var(--border-color);
-  overflow: hidden;
-  max-height: 0;
-  opacity: 0;
-  transition: max-height 0.4s cubic-bezier(0.25, 0.8, 0.25, 1), opacity 0.3s ease;
-}
-
-.mega-menu.active {
-  max-height: 400px;
-  opacity: 1;
-}
-
-.mega-menu-content {
-  display: flex;
-  padding: 40px;
-  gap: 40px;
-}
-
-.mega-image-wrapper img {
-  width: 300px;
-  height: 200px;
-  object-fit: cover;
-  border-radius: 4px;
-}
-
-.sub-links {
-  list-style: none;
-  margin-top: 15px;
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-}
-
-.sub-links li a:hover {
-  text-decoration: underline;
-  color: var(--kapital-accent);
-}
-
-/* --- Lookbook & Hotspot --- */
-.section-lookbook {
-  padding: 60px 40px;
-  text-align: center;
-}
-
-.section-title {
-  margin-bottom: 40px;
-  font-size: 32px;
-}
-
-.lookbook-frame {
-  position: relative;
-  max-width: 800px;
-  margin: 0 auto;
-  border: 1px solid var(--border-color);
-}
-
-.lookbook-img {
-  width: 100%;
-  display: block;
-}
-
-.hotspot {
-  position: absolute;
-  cursor: pointer;
-}
-
-.hotspot-dot {
-  display: block;
-  width: 16px;
-  height: 16px;
-  background-color: var(--kapital-accent);
-  border-radius: 50%;
-  border: 2px solid var(--kapital-bone);
-  box-shadow: 0 0 0 4px rgba(255, 255, 255, 0.2);
-  transition: transform 0.3s ease;
-}
-
-.hotspot:hover .hotspot-dot {
-  transform: scale(1.3);
-}
-
-.hotspot-tooltip {
-  position: absolute;
-  top: 25px;
-  left: 50%;
-  transform: translateX(-50%);
-  background-color: var(--bg-surface);
-  color: var(--text-primary);
-  border: 1px solid var(--border-color);
-  padding: 10px 15px;
-  white-space: nowrap;
-  opacity: 0;
-  pointer-events: none;
-  transition: opacity 0.3s ease;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  font-size: 12px;
-}
-
-.hotspot:hover .hotspot-tooltip {
-  opacity: 1;
-  pointer-events: auto;
-}
-
-/* --- Tags Section --- */
-.section-tags {
-  padding: 40px;
-  text-align: center;
-}
-
-.tag-container {
-  margin-top: 20px;
-  display: flex;
-  justify-content: center;
-  gap: 15px;
-  flex-wrap: wrap;
-}
-
-.tag-button {
-  padding: 8px 20px;
-  border: 1px solid var(--border-color);
-  background: transparent;
-  color: var(--text-primary);
-  border-radius: 50px;
-  cursor: pointer;
-  transition: all 0.3s ease;
-}
-
-.tag-button:hover {
-  background-color: var(--text-primary);
-  color: var(--bg-surface);
-  transform: translateY(-2px);
-}
-document.addEventListener('DOMContentLoaded', () => {
-  // --- Theme Toggle Logic ---
-  const themeToggleBtn = document.getElementById('themeToggle');
-  const htmlEl = document.documentElement;
-
-  themeToggleBtn.addEventListener('click', () => {
-    const currentTheme = htmlEl.getAttribute('data-theme');
-    if (currentTheme === 'indigo') {
-      htmlEl.removeAttribute('data-theme');
-      themeToggleBtn.textContent = 'Vintage Indigo Mode';
-    } else {
-      htmlEl.setAttribute('data-theme', 'indigo');
-      themeToggleBtn.textContent = 'Original White Mode';
-    }
-  });
-
-  // --- Visual Mega Menu Logic ---
-  const navItems = document.querySelectorAll('.nav-item');
-  const megaMenu = document.getElementById('megaMenu');
-  const megaMenuTitle = document.getElementById('megaMenuTitle');
-  const megaMenuDesc = document.getElementById('megaMenuDesc');
-  const megaMenuLinks = document.getElementById('megaMenuLinks');
-  
-  // 가상의 구조화된 카테고리 데이터
-  const menuData = {
-    journal: {
-      title: 'JOURNAL',
-      desc: '시즌 룩북 및 브랜드의 비주얼 아카이브.',
-      links: ['2026 SS ISLA BONITA', 'Kountry Fall/Winter', 'Denim Bauhaus']
-    },
-    shop: {
-      title: 'SHOP',
-      desc: '의류부터 액세서리까지, 직관적인 탐색 경로.',
-      links: ['Denim Pants', 'Boro Jackets', 'Knitwear', 'Accessories']
-    },
-    story: {
-      title: 'STORY',
-      desc: '장인 정신과 염색 기법, 코지마의 헤리티지.',
-      links: ['Century Denim', 'Indigo Dyeing Process', 'The Kojima Legacy']
-    },
-    locations: {
-      title: 'LOCATIONS',
-      desc: '전 세계 KAPITAL 오프라인 스토어 안내.',
-      links: ['Kyoto Store', 'Tokyo Shibuya', 'Global Stockists']
-    }
-  };
-
-  let hideTimeout;
-
-  // 메뉴 진입 시 메가메뉴 노출
-  navItems.forEach(item => {
-    item.addEventListener('mouseenter', (e) => {
-      clearTimeout(hideTimeout);
-      const category = e.target.getAttribute('data-menu');
-      const data = menuData[category];
-
-      if(data) {
-        megaMenuTitle.textContent = data.title;
-        megaMenuDesc.textContent = data.desc;
-        
-        // 서브 링크 동적 생성
-        megaMenuLinks.innerHTML = '';
-        data.links.forEach(linkText => {
-          const li = document.createElement('li');
-          li.innerHTML = `<a href="#">${linkText}</a>`;
-          megaMenuLinks.appendChild(li);
+            // 메뉴 활성화
+            megaMenu.classList.add('active');
+          }
         });
 
-        megaMenu.classList.add('active');
-      }
-    });
+        // 네비게이션에서 마우스가 벗어날 때 딜레이 후 닫힘 처리
+        item.addEventListener('mouseleave', () => {
+          hideTimeout = setTimeout(() => {
+            megaMenu.classList.remove('active');
+          }, 250); 
+        });
+      });
 
-    item.addEventListener('mouseleave', () => {
-      hideTimeout = setTimeout(() => {
+      // 메가 메뉴 영역 위로 마우스를 옮겨도 메뉴가 닫히지 않도록 유지
+      megaMenu.addEventListener('mouseenter', () => {
+        clearTimeout(hideTimeout);
+      });
+
+      // 메가 메뉴 영역에서 완전히 벗어나면 닫힘
+      megaMenu.addEventListener('mouseleave', () => {
         megaMenu.classList.remove('active');
-      }, 200); // 부드러운 전환을 위한 딜레이
+      });
+      
     });
-  });
-
-  // 메가메뉴 자체에서 마우스가 머물 때 닫히지 않도록 방지
-  megaMenu.addEventListener('mouseenter', () => {
-    clearTimeout(hideTimeout);
-  });
-
-  megaMenu.addEventListener('mouseleave', () => {
-    megaMenu.classList.remove('active');
-  });
-});
+  </script>
+</body>
+</html>
